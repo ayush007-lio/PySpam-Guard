@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpamHound Classifier</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="bg-light">
+
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card p-4 p-md-5 shadow-sm" style="max-width: 550px; width: 100%;">
+      
+      <img src="{{ url_for('static', filename='SpamHound_Icon.png') }}" alt="SpamHound Logo" class="logo-img mx-auto d-block mb-3">
+      
+      <h2 class="text-center mb-3">SpamHound 🐾</h2>
+      <p class="text-center text-muted mb-4">Enter a message to check if it's spam or safe.</p>
+
+      <form id="spam-form">
+        <div class="mb-3">
+          <textarea name="message" class="form-control" rows="5" placeholder="Type or paste your message here..." required></textarea>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg custom-btn">Check Message</button>
+        </div>
+      </form>
+      
+      <div id="result-area" class="text-center mt-4">
+        </div>
+
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Wait for the page to fully load
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // Get the form and the result area
+      const spamForm = document.getElementById('spam-form');
+      const resultArea = document.getElementById('result-area');
+
+      // Listen for the form's 'submit' event
+      spamForm.addEventListener('submit', function(event) {
+        
+        // **This is the most important part**
+        // It stops the form from reloading the page
+        event.preventDefault(); 
+        
+        // Show a loading spinner
+        resultArea.innerHTML = `
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Checking...</span>
+          </div>
+          <p class="mt-2">Checking message...</p>
+        `;
+
+        // Send the form data to the Flask backend
+        fetch('/predict', {
+          method: 'POST',
+          body: new FormData(spamForm) // Gets data from the <textarea>
+        })
+        .then(response => response.json()) // Read the JSON response from Flask
+        .then(data => {
+          // 'data' is the object: {prediction_text: "...", prediction_image: "..."}
+          
+          // Create the HTML to show the result
+          resultArea.innerHTML = `
+            <img src="${data.prediction_image}" alt="Result" class="result-img">
+            <h3 class="mt-3">${data.prediction_text}</h3>
+          `;
+        })
+        .catch(error => {
+          // Show an error if something goes wrong
+          console.error('Error:', error);
+          resultArea.innerHTML = `
+            <div class="alert alert-danger">
+              Oops! Something went wrong. Please try again.
+            </div>
+          `;
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
