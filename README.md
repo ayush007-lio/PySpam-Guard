@@ -3,6 +3,7 @@ PySpam-Guard: ML Spam Classifier Web App
        An intelligent spam filter web app built with Python. Uses a Scikit-learn (Naive Bayes) model deployed via Flask to classify SMS messages as ham or spam in real-time.
       
       This is an end-to-end machine learning project that takes a raw dataset of SMS messages (`spam.csv`), builds a classification model, and deploys it as a simple web application using Flask.
+<img width="972" height="782" alt="spam" src="https://github.com/user-attachments/assets/88541503-6dc5-48f3-ae82-ddb4a05cb31c" />
 
 
  🚀 Features
